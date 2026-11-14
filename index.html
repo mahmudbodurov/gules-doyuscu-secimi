@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="az">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Güləş — Döyüşçü seçimi (dizayn)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary:#1F6F5C; --accent:#F2A541; --bg:#FAFAF7; --text:#1B1B1B;
+    --muted:rgba(27,27,27,.6); --line:rgba(27,27,27,.08);
+    --s1:8px; --s2:16px; --s3:24px; --s4:32px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Inter,system-ui,sans-serif;background:#E9E9E4;color:var(--text);
+       font-size:16px;line-height:24px;padding:var(--s4)}
+  h1.page{font-size:24px;line-height:32px;font-weight:600;margin-bottom:var(--s1)}
+  p.page{color:var(--muted);margin-bottom:var(--s4)}
+  .board{display:flex;gap:var(--s4);flex-wrap:wrap;align-items:flex-start}
+  .artboard>.label{font-weight:600;margin-bottom:var(--s1)}
+  .artboard>.label span{color:var(--muted);font-weight:400}
+
+  /* Phone */
+  .phone{width:375px;height:812px;background:var(--bg);border-radius:40px;overflow:hidden;
+         position:relative;box-shadow:0 20px 50px rgba(0,0,0,.15);display:flex;flex-direction:column}
+  .status{height:44px;display:flex;justify-content:space-between;align-items:center;
+          padding:0 var(--s3);font-weight:600;font-size:16px}
+  .topbar{height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 var(--s2)}
+  .iconbtn{width:48px;height:48px;display:grid;place-items:center;border-radius:12px;cursor:pointer}
+  .iconbtn svg{width:24px;height:24px}
+  .steps{display:flex;gap:var(--s1);align-items:center}
+  .steps i{width:8px;height:8px;border-radius:4px;background:var(--line);display:block}
+  .steps i.on{width:24px;background:var(--primary)}
+  .steps i.done{background:var(--primary);opacity:.4}
+  .scroll{flex:1;overflow-y:auto;padding:0 var(--s2) 104px}
+  .scroll::-webkit-scrollbar{display:none}
+  .title{font-size:24px;line-height:32px;font-weight:600;margin-top:var(--s2)}
+  .sub{color:var(--muted);margin-bottom:var(--s3)}
+
+  .chips{display:flex;gap:var(--s1);overflow-x:auto;margin:0 calc(-1*var(--s2)) var(--s2);padding:0 var(--s2)}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{height:32px;padding:0 var(--s2);border-radius:16px;border:1px solid rgba(27,27,27,.16);
+        display:flex;align-items:center;white-space:nowrap;cursor:pointer;background:#fff}
+  .chip.on{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600}
+
+  .search{height:48px;border-radius:12px;background:#fff;border:1px solid var(--line);display:flex;
+          align-items:center;gap:var(--s1);padding:0 var(--s2);color:var(--muted);margin-bottom:var(--s3)}
+  .search svg{width:24px;height:24px;flex:none}
+
+  .section{display:flex;justify-content:space-between;align-items:center;font-weight:600;
+           margin:var(--s1) 0 var(--s1)}
+  .section a{color:var(--primary);text-decoration:none;font-weight:600}
+  .list{display:flex;flex-direction:column;gap:var(--s1)}
+
+  /* WrestlerCard */
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:var(--s2);
+        display:flex;gap:var(--s2);align-items:flex-start;cursor:pointer;position:relative;
+        transition:border-color .15s,background .15s}
+  .card .ava{width:48px;height:48px;border-radius:24px;flex:none;display:grid;place-items:center;
+             font-weight:600;color:#fff;background:var(--primary)}
+  .card .body{flex:1;min-width:0}
+  .card .name{font-weight:600}
+  .card .meta{color:var(--muted)}
+  .card .match{display:flex;align-items:center;gap:var(--s1);margin-top:var(--s1)}
+  .radio{width:24px;height:24px;border-radius:12px;border:2px solid rgba(27,27,27,.24);flex:none;
+         display:grid;place-items:center;margin-top:var(--s1)}
+  .card.sel{border:2px solid var(--primary);background:#EEF4F2;padding:15px}
+  .card.sel .radio{border-color:var(--primary);background:var(--primary)}
+  .card.sel .radio::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2px 2px 0;
+                          transform:rotate(45deg) translate(-1px,-1px)}
+  .card.off{opacity:.4;cursor:default}
+
+  .badge{height:24px;padding:0 var(--s1);border-radius:8px;display:inline-flex;align-items:center;
+         font-weight:600;background:rgba(31,111,92,.1);color:var(--primary);white-space:nowrap}
+  .badge.hot{background:var(--accent);color:var(--text)}
+  .vs{color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* Selected hero */
+  .hero{background:var(--primary);color:#fff;border-radius:12px;padding:var(--s2);margin-bottom:var(--s3)}
+  .hero .row{display:flex;align-items:center;gap:var(--s2)}
+  .hero .ava{width:48px;height:48px;border-radius:24px;background:rgba(255,255,255,.2);display:grid;
+             place-items:center;font-weight:600}
+  .hero .muted{opacity:.7}
+  .hero .vsrow{display:flex;justify-content:space-between;align-items:center;margin-top:var(--s2);
+               padding-top:var(--s2);border-top:1px solid rgba(255,255,255,.2)}
+  .hero .badge{background:rgba(255,255,255,.16);color:#fff}
+
+  /* Bottom bar */
+  .bottom{position:absolute;left:0;right:0;bottom:0;padding:var(--s2) var(--s2) var(--s3);
+          background:linear-gradient(to top,var(--bg) 70%,rgba(250,250,247,0))}
+  .btn{height:48px;border-radius:12px;background:var(--primary);color:#fff;font-weight:600;
+       border:0;width:100%;font:inherit;font-weight:600;cursor:pointer}
+  .btn:active{filter:brightness(.92)}
+  .btn[disabled]{opacity:.4;cursor:default}
+  .btn.ghost{background:transparent;color:var(--primary);border:1px solid var(--primary)}
+
+  /* Empty / skeleton */
+  .empty{text-align:center;padding:var(--s4) var(--s2)}
+  .empty .ico{width:64px;height:64px;border-radius:32px;background:rgba(31,111,92,.1);margin:0 auto var(--s2);
+              display:grid;place-items:center;color:var(--primary)}
+  .empty .ico svg{width:32px;height:32px}
+  .empty p{color:var(--muted);margin:var(--s1) 0 var(--s3)}
+  .sk{background:#fff;border:1px solid var(--line);border-radius:12px;padding:var(--s2);display:flex;gap:var(--s2)}
+  .sk .c{width:48px;height:48px;border-radius:24px}
+  .sk .l{height:16px;border-radius:8px;margin-bottom:var(--s1)}
+  .shimmer{background:linear-gradient(90deg,#EFEFEA 25%,#F7F7F3 50%,#EFEFEA 75%);background-size:200% 100%;
+           animation:sh 1.2s infinite}
+  @keyframes sh{to{background-position:-200% 0}}
+
+  /* Component sheet */
+  .sheet{width:420px;background:#fff;border-radius:24px;padding:var(--s3)}
+  .sheet h3{font-weight:600;margin:var(--s3) 0 var(--s1)}
+  .sheet h3:first-child{margin-top:0}
+  .sw{display:flex;gap:var(--s2)}
+  .sw div{flex:1}
+  .sw b{display:block;height:48px;border-radius:12px;margin-bottom:var(--s1)}
+  .sw small{font-size:16px;color:var(--muted)}
+  .row8{display:flex;gap:var(--s1);flex-wrap:wrap;align-items:center}
+  .stack{display:flex;flex-direction:column;gap:var(--s1)}
+  .type1{font-size:24px;line-height:32px;font-weight:600}
+</style>
+</head>
+<body>
+
+<h1 class="page">Güləş · Növbəti görüşlər → Döyüşçü seçimi</h1>
+<p class="page">Addım 2/4 · 375×812 · Inter 24/32 + 16/24 · boşluq 8/16/24/32 · düymə r12 h48. Birinci ekran interaktivdir: kart və çiplərə klikləyin.</p>
+
+<div class="board">
+
+  <!-- 1. Interactive main screen -->
+  <div class="artboard">
+    <div class="label">1 · Əsas ekran <span>(interaktiv)</span></div>
+    <div class="phone" id="main">
+      <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+      <div class="topbar">
+        <div class="iconbtn" aria-label="Geri"><svg viewBox="0 0 24 24" fill="none" stroke="#1B1B1B" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></div>
+        <div class="steps"><i class="done"></i><i class="on"></i><i></i><i></i></div>
+        <div class="iconbtn" aria-label="Filtr"><svg viewBox="0 0 24 24" fill="none" stroke="#1B1B1B" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg></div>
+      </div>
+      <div class="scroll">
+        <div class="title">Döyüşçü seç</div>
+        <div class="sub">12 görüş · 14 noyabr</div>
+
+        <div class="chips" id="chips"></div>
+
+        <div class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg>
+          Ad və ya klub axtar
+        </div>
+
+        <div id="hero"></div>
+
+        <div class="section"><span>Bu gün · <span id="cntToday">4</span></span><a href="#">Hamısı →</a></div>
+        <div class="list" id="today"></div>
+        <div class="section" style="margin-top:16px"><span>Sabah · <span id="cntTom">3</span></span><a href="#">Hamısı →</a></div>
+        <div class="list" id="tomorrow"></div>
+      </div>
+      <div class="bottom"><button class="btn" id="cta" disabled>Davam et</button></div>
+    </div>
+  </div>
+
+  <!-- 2. Empty state -->
+  <div class="artboard">
+    <div class="label">2 · Boş hal <span>(kateqoriyada görüş yoxdur)</span></div>
+    <div class="phone">
+      <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+      <div class="topbar">
+        <div class="iconbtn"><svg viewBox="0 0 24 24" fill="none" stroke="#1B1B1B" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></div>
+        <div class="steps"><i class="done"></i><i class="on"></i><i></i><i></i></div>
+        <div class="iconbtn"><svg viewBox="0 0 24 24" fill="none" stroke="#1B1B1B" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg></div>
+      </div>
+      <div class="scroll">
+        <div class="title">Döyüşçü seç</div>
+        <div class="sub">0 görüş · 14 noyabr</div>
+        <div class="chips">
+          <div class="chip">57 kq</div><div class="chip">65 kq</div><div class="chip">74 kq</div>
+          <div class="chip">86 kq</div><div class="chip">97 kq</div><div class="chip on">125 kq</div>
+        </div>
+        <div class="empty">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16"/></svg></div>
+          <div style="font-weight:600">Bu kateqoriyada görüş yoxdur</div>
+          <p>125 kq üçün növbəti görüşlər 16 noyabrda başlayır.</p>
+          <button class="btn ghost">Kateqoriyanı dəyiş</button>
+        </div>
+      </div>
+      <div class="bottom"><button class="btn" disabled>Davam et</button></div>
+    </div>
+  </div>
+
+  <!-- 3. Loading -->
+  <div class="artboard">
+    <div class="label">3 · Yüklənmə <span>(skelet)</span></div>
+    <div class="phone">
+      <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+      <div class="topbar">
+        <div class="iconbtn"><svg viewBox="0 0 24 24" fill="none" stroke="#1B1B1B" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></div>
+        <div class="steps"><i class="done"></i><i class="on"></i><i></i><i></i></div>
+        <div class="iconbtn"><svg viewBox="0 0 24 24" fill="none" stroke="#1B1B1B" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg></div>
+      </div>
+      <div class="scroll">
+        <div class="title">Döyüşçü seç</div>
+        <div class="sub">Görüşlər yüklənir…</div>
+        <div class="chips">
+          <div class="chip">57 kq</div><div class="chip">65 kq</div><div class="chip on">74 kq</div>
+          <div class="chip">86 kq</div><div class="chip">97 kq</div>
+        </div>
+        <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg>Ad və ya klub axtar</div>
+        <div class="list">
+          <div class="sk"><div class="c shimmer"></div><div style="flex:1"><div class="l shimmer" style="width:60%"></div><div class="l shimmer" style="width:40%"></div><div class="l shimmer" style="width:70%;margin:0"></div></div></div>
+          <div class="sk"><div class="c shimmer"></div><div style="flex:1"><div class="l shimmer" style="width:55%"></div><div class="l shimmer" style="width:45%"></div><div class="l shimmer" style="width:65%;margin:0"></div></div></div>
+          <div class="sk"><div class="c shimmer"></div><div style="flex:1"><div class="l shimmer" style="width:65%"></div><div class="l shimmer" style="width:35%"></div><div class="l shimmer" style="width:60%;margin:0"></div></div></div>
+          <div class="sk"><div class="c shimmer"></div><div style="flex:1"><div class="l shimmer" style="width:50%"></div><div class="l shimmer" style="width:40%"></div><div class="l shimmer" style="width:70%;margin:0"></div></div></div>
+        </div>
+      </div>
+      <div class="bottom"><button class="btn" disabled>Davam et</button></div>
+    </div>
+  </div>
+
+  <!-- 4. Component sheet -->
+  <div class="artboard">
+    <div class="label">4 · Komponentlər və tokenlər</div>
+    <div class="sheet">
+      <h3>Rəng</h3>
+      <div class="sw">
+        <div><b style="background:#1F6F5C"></b><small>Əsas #1F6F5C</small></div>
+        <div><b style="background:#F2A541"></b><small>Vurğu #F2A541</small></div>
+      </div>
+      <div class="sw" style="margin-top:8px">
+        <div><b style="background:#FAFAF7;border:1px solid var(--line)"></b><small>Fon #FAFAF7</small></div>
+        <div><b style="background:#1B1B1B"></b><small>Mətn #1B1B1B</small></div>
+      </div>
+
+      <h3>Şrift · Inter</h3>
+      <div class="type1">24/32 Semibold — Başlıq</div>
+      <div style="font-weight:600">16/24 Semibold — ad, düymə</div>
+      <div>16/24 Regular — rəqib, vaxt</div>
+      <div style="color:var(--muted)">16/24 Regular 60% — klub, rekord</div>
+
+      <h3>CategoryChip</h3>
+      <div class="row8"><div class="chip on">74 kq</div><div class="chip">86 kq</div></div>
+
+      <h3>TimeBadge</h3>
+      <div class="row8"><span class="badge">14:30</span><span class="badge hot">CANLI</span><span class="badge hot">15 dəq</span></div>
+
+      <h3>WrestlerCard · hallar</h3>
+      <div class="stack" id="cardStates"></div>
+
+      <h3>PrimaryButton</h3>
+      <div class="stack"><button class="btn">Davam et</button><button class="btn" disabled>Davam et</button><button class="btn ghost">Kateqoriyanı dəyiş</button></div>
+
+      <h3>StepIndicator</h3>
+      <div class="steps"><i class="done"></i><i class="on"></i><i></i><i></i></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const cats=["57 kq","65 kq","74 kq","86 kq","97 kq","125 kq"];
+const data={
+ "74 kq":{
+  today:[
+   {id:1,ini:"RH",name:"Ramil Həsənov",club:"Neftçi",flag:"🇦🇿",rec:"18–3",time:"CANLI",hot:true,vs:"T. Kaya"},
+   {id:2,ini:"EM",name:"Elvin Məmmədov",club:"Qarabağ",flag:"🇦🇿",rec:"14–5",time:"15 dəq",hot:true,vs:"G. Beridze"},
+   {id:3,ini:"AK",name:"Arsen Kuliyev",club:"Atlant",flag:"🇦🇿",rec:"11–6",time:"14:30",vs:"M. Novak"},
+   {id:4,ini:"OS",name:"Orxan Səfərov",club:"Sumqayıt",flag:"🇦🇿",rec:"9–4",time:"Bitib",off:true,vs:"D. Popescu"}
+  ],
+  tomorrow:[
+   {id:5,ini:"TK",name:"Tural Kərimov",club:"Neftçi",flag:"🇦🇿",rec:"20–2",time:"10:00",vs:"A. Sadulayev"},
+   {id:6,ini:"NQ",name:"Nihad Quliyev",club:"Gəncə",flag:"🇦🇿",rec:"7–3",time:"11:15",vs:"L. Varga"},
+   {id:7,ini:"SA",name:"Samir Abbasov",club:"Lənkəran",flag:"🇦🇿",rec:"12–8",time:"12:45",vs:"Y. Sato"}
+  ]}
+};
+let cat="74 kq", sel=null;
+
+function card(w,selected){
+  const b=`<span class="badge ${w.hot?'hot':''}">${w.time}</span>`;
+  return `<div class="card ${selected?'sel':''} ${w.off?'off':''}" data-id="${w.id}">
+    <div class="ava">${w.ini}</div>
+    <div class="body">
+      <div class="name">${w.name}</div>
+      <div class="meta">${w.club} · ${w.flag} · ${w.rec}</div>
+      <div class="match">${b}<span class="vs">vs. ${w.vs}</span></div>
+    </div>
+    <div class="radio"></div>
+  </div>`;
+}
+function all(){const d=data[cat]||{today:[],tomorrow:[]};return [...d.today,...d.tomorrow];}
+function render(){
+  document.getElementById("chips").innerHTML=cats.map(c=>`<div class="chip ${c===cat?'on':''}" data-c="${c}">${c}</div>`).join("");
+  const d=data[cat]||{today:[],tomorrow:[]};
+  document.getElementById("today").innerHTML=d.today.map(w=>card(w,w.id===sel)).join("");
+  document.getElementById("tomorrow").innerHTML=d.tomorrow.map(w=>card(w,w.id===sel)).join("");
+  document.getElementById("cntToday").textContent=d.today.length;
+  document.getElementById("cntTom").textContent=d.tomorrow.length;
+  const w=all().find(x=>x.id===sel);
+  document.getElementById("hero").innerHTML=w?`<div class="hero">
+    <div class="row"><div class="ava">${w.ini}</div><div><div style="font-weight:600">${w.name}</div><div class="muted">${w.club} · ${w.rec}</div></div></div>
+    <div class="vsrow"><span>vs. ${w.vs}</span><span class="badge" ${w.hot?'style="background:#F2A541;color:#1B1B1B"':''}>${w.time}</span></div>
+  </div>`:"";
+  const cta=document.getElementById("cta");
+  cta.disabled=!w; cta.textContent=w?`Davam et · ${w.name.split(" ")[0]}`:"Davam et";
+}
+document.getElementById("main").addEventListener("click",e=>{
+  const ch=e.target.closest(".chip"); if(ch){cat=ch.dataset.c;sel=null;render();return;}
+  const c=e.target.closest(".card"); if(c&&!c.classList.contains("off")){const id=+c.dataset.id;sel=sel===id?null:id;render();}
+});
+data["74 kq"] && render();
+// Cards in sheet
+const s=data["74 kq"];
+document.getElementById("cardStates").innerHTML=
+  card(s.today[2],false)+card(s.today[2],true)+card(s.today[0],false)+card(s.today[3],false);
+</script>
+</body>
+</html>
